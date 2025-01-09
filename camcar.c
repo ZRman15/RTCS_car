@@ -96,7 +96,7 @@ void camcar(int argc, char *argv[], struct thread_dat *ptdat)
         if (obstacle) {
             mvprintw(3, 1,"State OA (stop to avoid obstacle), o-left=%d, o-right=%d", obstacle_L, obstacle_R);
             clrtoeol(); // curses library
-            initio_DriveForward (0); // Stop
+            initio_DriveForward (0); //top
         }
         else {
             refresh(); // curses lib: update display
@@ -112,10 +112,10 @@ void camcar(int argc, char *argv[], struct thread_dat *ptdat)
 
             // FSM-SB (Search Blob)
             if ( ! blobSufficient ) {
-                unsigned long currentTime = millis();  // Get the current time
+                unsigned long currentTime = millis();  // get the current time
 
                 if (!timeoutActive) {
-                searchStartTime = currentTime;
+                searchStartTime = currentTime; 
                 timeoutActive = 1;
                 }
 
@@ -130,21 +130,21 @@ void camcar(int argc, char *argv[], struct thread_dat *ptdat)
                 {
                     if (currentTime - searchStartTime >= TIMEOUT) {
                     mvprintw(4, 1, "Blob search timed out. Stopping.");
-                    initio_DriveForward(0);  // stop
-                    timeoutActive = 0;       // Reset timeout
-                }
+                    initio_DriveForward(0); // stop
+                    timeoutActive = 0; // reset timeout
+                    delay(5000); // wait 5 seconds
+                    }
                 else {
                     mvprintw(4, 1, "Trying to find blob...");
                     initio_SpinLeft(turnSpeed);  // rotate left
-                    
-                }
-                }
+                    }
+                } // end FSM-SB
 
             } else {
                 carBlobAligned = (blob.halign >= -alignThreshold && blob.halign <= alignThreshold);  // TODO: adjust values to useful ones
 
                 // FSM-AB (Align to Blob)
-                if ( ! carBlobAligned) {
+                if (!carBlobAligned) {
                     mvprintw(3, 1,"State AB (align towards blob), blob.size=%d, halign=%f", blob.size, blob.halign);
                     clrtoeol(); // curses library
                     if (blobnr < ptdat->blobnr) {
@@ -166,7 +166,7 @@ void camcar(int argc, char *argv[], struct thread_dat *ptdat)
                     else if (distance > DIST_MAX) { distanceState = toofar; }
                     else                          { distanceState = distok; }
  
-                    // FSM-MB (cat at middle of blob, keep distance)
+                    // FSM-MB (car at middle of blob, keep distance)
                     switch (distanceState) {
                     case toofar:
                         mvprintw(3, 1,"State FB (drive forward), dist=%d", distance);
